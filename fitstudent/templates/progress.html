@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% block title %}Progress Tracker – FitStudent AI{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="page-title">Progress Tracker</h1>
+    <p class="page-subtitle">
+      Log your weight and workout completion to track your journey over time.
+    </p>
+
+    <!-- Add Progress Form -->
+    {% if show_form or not records %}
+      <div class="form-container progress-form-box">
+        <h2>Add Today's Record</h2>
+        <form id="progressForm" method="POST"
+              action="{{ url_for('progress_add') }}" novalidate>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="record_date">Date <span class="required">*</span></label>
+              <input type="date" id="record_date" name="record_date"
+                     class="form-control"
+                     value="{{ form.record_date if form else today }}"
+                     required />
+            </div>
+            <div class="form-group">
+              <label for="weight">Current Weight (kg) <span class="required">*</span></label>
+              <input type="number" id="weight" name="weight"
+                     class="form-control" placeholder="e.g. 68.5"
+                     value="{{ form.weight if form else '' }}"
+                     min="20" max="500" step="0.1" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" name="workout_completed" value="1"
+                     {% if form and form.get('workout_completed') %}checked{% endif %} />
+              &nbsp; I completed my workout today
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label for="notes">Notes (optional)</label>
+            <textarea id="notes" name="notes" class="form-control"
+                      rows="2"
+                      placeholder="How did you feel today? Any highlights?">{{ form.notes if form else '' }}</textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save Record</button>
+            {% if records %}
+              <a href="{{ url_for('progress') }}" class="btn btn-outline">Cancel</a>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+    {% else %}
+      <div class="action-bar mb-1">
+        <a href="{{ url_for('progress_add') }}" class="btn btn-primary">+ Add Today's Record</a>
+      </div>
+    {% endif %}
+
+    <!-- Progress History -->
+    {% if records %}
+      <h2 class="mt-2">Progress History</h2>
+
+      <!-- Simple SVG weight chart -->
+      {% if records|length > 1 %}
+        <div class="chart-container">
+          <h3 class="chart-title">Weight Over Time</h3>
+          {% set ns = namespace(min_w=records[0].weight, max_w=records[0].weight) %}
+          {% for r in records %}
+            {% if r.weight < ns.min_w %}{% set ns.min_w = r.weight %}{% endif %}
+            {% if r.weight > ns.max_w %}{% set ns.max_w = r.weight %}{% endif %}
+          {% endfor %}
+          {% set chart_w = 700 %}
+          {% set chart_h = 200 %}
+          {% set pad = 40 %}
+          {% set w_range = (ns.max_w - ns.min_w) if (ns.max_w - ns.min_w) > 0 else 1 %}
+          {% set rev_records = records | reverse | list %}
+          {% set n = rev_records | length %}
+          <svg viewBox="0 0 {{ chart_w }} {{ chart_h }}"
+               preserveAspectRatio="xMidYMid meet"
+               class="weight-chart" aria-label="Weight chart">
+            <!-- Grid lines -->
+            <line x1="{{ pad }}" y1="{{ pad }}" x2="{{ chart_w - pad }}" y2="{{ pad }}"
+                  stroke="#e5e7eb" stroke-width="1"/>
+            <line x1="{{ pad }}" y1="{{ (chart_h - pad) // 2 + pad // 2 }}"
+                  x2="{{ chart_w - pad }}" y2="{{ (chart_h - pad) // 2 + pad // 2 }}"
+                  stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,4"/>
+            <line x1="{{ pad }}" y1="{{ chart_h - pad }}"
+                  x2="{{ chart_w - pad }}" y2="{{ chart_h - pad }}"
+                  stroke="#e5e7eb" stroke-width="1"/>
+            <!-- Y labels -->
+            <text x="{{ pad - 5 }}" y="{{ pad + 4 }}" text-anchor="end"
+                  font-size="11" fill="#57606a">{{ '%.1f'|format(ns.max_w) }}</text>
+            <text x="{{ pad - 5 }}" y="{{ chart_h - pad + 4 }}" text-anchor="end"
+                  font-size="11" fill="#57606a">{{ '%.1f'|format(ns.min_w) }}</text>
+            <!-- Polyline -->
+            {% set pts = namespace(val='') %}
+            {% for i in range(n) %}
+              {% set r = rev_records[i] %}
+              {% set x = pad + (i / (n - 1)) * (chart_w - 2 * pad) if n > 1 else chart_w // 2 %}
+              {% set y = chart_h - pad - ((r.weight - ns.min_w) / w_range) * (chart_h - 2 * pad) %}
+              {% set pts.val = pts.val + x|string + ',' + y|string + ' ' %}
+            {% endfor %}
+            <polyline points="{{ pts.val }}"
+                      fill="none" stroke="#3b82d4" stroke-width="2.5"
+                      stroke-linejoin="round" stroke-linecap="round"/>
+            <!-- Data points -->
+            {% for i in range(n) %}
+              {% set r = rev_records[i] %}
+              {% set x = pad + (i / (n - 1)) * (chart_w - 2 * pad) if n > 1 else chart_w // 2 %}
+              {% set y = chart_h - pad - ((r.weight - ns.min_w) / w_range) * (chart_h - 2 * pad) %}
+              <circle cx="{{ x }}" cy="{{ y }}" r="5"
+                      fill="#3b82d4" stroke="#ffffff" stroke-width="2"/>
+            {% endfor %}
+          </svg>
+        </div>
+      {% endif %}
+
+      <!-- Table of records -->
+      <div class="table-wrapper">
+        <table class="progress-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Weight (kg)</th>
+              <th>Workout Done</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for rec in records %}
+              <tr>
+                <td>{{ rec.record_date.strftime('%d %b %Y') }}</td>
+                <td><strong>{{ rec.weight }}</strong></td>
+                <td>
+                  {% if rec.workout_completed %}
+                    <span class="badge badge-success">✓ Yes</span>
+                  {% else %}
+                    <span class="badge badge-muted">— No</span>
+                  {% endif %}
+                </td>
+                <td class="muted">{{ rec.notes or '—' }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    {% else %}
+      <div class="empty-state mt-2">
+        <p>No progress records yet. Start logging your progress above!</p>
+      </div>
+    {% endif %}
+
+    <div class="action-bar mt-2">
+      <a href="{{ url_for('dashboard') }}" class="btn btn-outline">← Back to Dashboard</a>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Set default date to today
+  const dateInput = document.getElementById('record_date');
+  if (dateInput && !dateInput.value) {
+    dateInput.value = new Date().toISOString().split('T')[0];
+  }
+</script>
+{% endblock %}

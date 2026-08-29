@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Workout Plan – FitStudent AI{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="page-title">Your 7-Day Workout Plan</h1>
+    <p class="page-subtitle">
+      Goal: <strong>{{ user.fitness_goal }}</strong> &nbsp;·&nbsp;
+      Level: <strong>{{ user.fitness_level }}</strong> &nbsp;·&nbsp;
+      Equipment: <strong>{{ user.workout_pref.available_equipment if user.workout_pref else 'N/A' }}</strong>
+    </p>
+    <p class="disclaimer">
+      ⚠️ These are general exercise suggestions. Warm up for 5 minutes before exercising
+      and cool down / stretch afterwards. Stop if you feel pain.
+    </p>
+
+    {% if plan %}
+
+      <!-- Weekly overview strip -->
+      <div class="week-strip">
+        {% for day in plan %}
+          <a href="#day-{{ loop.index }}"
+             class="day-chip day-chip-{{ day.type }}">
+            {{ day.day[:3] }}
+          </a>
+        {% endfor %}
+      </div>
+
+      <!-- Day-by-day cards -->
+      {% for day in plan %}
+        <div class="day-card day-card-{{ day.type }}" id="day-{{ loop.index }}">
+          <div class="day-header">
+            <div class="day-name">{{ day.day }}</div>
+            <div class="day-focus">{{ day.focus }}</div>
+            <span class="day-type-badge badge-{{ day.type }}">
+              {% if day.type == 'rest' %}Rest Day{% elif day.type == 'active_recovery' %}Active Recovery{% else %}Workout{% endif %}
+            </span>
+          </div>
+
+          {% if day.exercises %}
+            <div class="exercises-grid">
+              {% for ex in day.exercises %}
+                <div class="exercise-card">
+                  <div class="ex-name">{{ ex.name }}</div>
+                  <div class="ex-meta">
+                    {% if ex.sets %}<span class="ex-tag">{{ ex.sets }} sets</span>{% endif %}
+                    {% if ex.reps and ex.reps != '—' %}<span class="ex-tag">{{ ex.reps }} reps</span>{% endif %}
+                    {% if ex.duration and ex.duration != '—' %}<span class="ex-tag">{{ ex.duration }}</span>{% endif %}
+                    {% if ex.rest and ex.rest != '—' %}<span class="ex-tag rest-tag">Rest: {{ ex.rest }}</span>{% endif %}
+                  </div>
+                  <p class="ex-instructions">{{ ex.instructions }}</p>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="rest-message">
+              {% if day.type == 'rest' %}
+                🛌 Take a full rest today. Sleep well, hydrate, and let your muscles recover.
+              {% else %}
+                🚶 Light activity only — a walk, gentle stretching, or yoga.
+              {% endif %}
+            </p>
+          {% endif %}
+
+        </div>
+      {% endfor %}
+
+    {% else %}
+      <div class="empty-state">
+        <p>No workout plan found.</p>
+        <a href="{{ url_for('preferences') }}" class="btn btn-primary">Set Preferences First →</a>
+      </div>
+    {% endif %}
+
+    <div class="action-bar mt-2">
+      <a href="{{ url_for('dashboard') }}" class="btn btn-outline">← Back to Dashboard</a>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

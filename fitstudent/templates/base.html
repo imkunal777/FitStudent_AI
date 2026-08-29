@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}FitStudent AI{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+
+  <!-- ===== NAVIGATION BAR ===== -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a class="nav-brand" href="{{ url_for('index') }}">
+        <span class="brand-icon">💪</span> FitStudent AI
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">&#9776;</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="{{ url_for('index') }}">Home</a></li>
+        <li><a href="{{ url_for('profile') }}">Profile</a></li>
+        <li><a href="{{ url_for('preferences') }}">Preferences</a></li>
+        <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+        <li><a href="{{ url_for('workout_plan') }}">Workout</a></li>
+        <li><a href="{{ url_for('meal_plan') }}">Meal Plan</a></li>
+        <li><a href="{{ url_for('progress') }}">Progress</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ===== FLASH MESSAGES ===== -->
+  <div class="container mt-1">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Generic error from 404/500 handler -->
+    {% if error_message %}
+      <div class="alert alert-danger">{{ error_message }}</div>
+    {% endif %}
+  </div>
+
+  <!-- ===== PAGE CONTENT ===== -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="site-footer">
+    <div class="container">
+      <p>
+        FitStudent AI by KUNAL &copy; {{ 2025 }} &nbsp;|&nbsp;
+        ⚠️ All fitness and nutrition values are general estimates and are <strong>not medical advice</strong>.
+        Consult a healthcare professional before starting any fitness programme.
+      </p>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}Preferences – FitStudent AI{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container form-container">
+    <h1 class="page-title">Your Preferences</h1>
+    <p class="page-subtitle">
+      Help us personalise your workout and meal plan further.
+    </p>
+
+    <form id="preferencesForm" method="POST" action="{{ url_for('preferences') }}" novalidate>
+
+      <!-- ======= WORKOUT PREFERENCES ======= -->
+      <div class="pref-section">
+        <h2 class="pref-section-title">🏋️ Workout Preferences</h2>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="daily_workout_time">
+              Daily Workout Time (minutes) <span class="required">*</span>
+            </label>
+            <input type="number" id="daily_workout_time" name="daily_workout_time"
+                   class="form-control" placeholder="e.g. 45"
+                   value="{{ form.daily_workout_time if form else (workout_pref.daily_workout_time if workout_pref else '') }}"
+                   min="10" max="240" required />
+          </div>
+
+          <div class="form-group">
+            <label for="available_equipment">
+              Available Equipment <span class="required">*</span>
+            </label>
+            <select id="available_equipment" name="available_equipment"
+                    class="form-control" required>
+              <option value="">-- Select --</option>
+              {% set cur_eq = (form.available_equipment if form else
+                               (workout_pref.available_equipment if workout_pref else '')) %}
+              <option value="No Equipment"         {% if cur_eq == 'No Equipment'         %}selected{% endif %}>No Equipment (Bodyweight Only)</option>
+              <option value="Dumbbells"             {% if cur_eq == 'Dumbbells'             %}selected{% endif %}>Dumbbells</option>
+              <option value="Resistance Bands"      {% if cur_eq == 'Resistance Bands'      %}selected{% endif %}>Resistance Bands</option>
+              <option value="Basic Home Equipment"  {% if cur_eq == 'Basic Home Equipment'  %}selected{% endif %}>Basic Home Equipment</option>
+              <option value="Full Gym Access"       {% if cur_eq == 'Full Gym Access'       %}selected{% endif %}>Full Gym Access</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======= DIETARY PREFERENCES ======= -->
+      <div class="pref-section">
+        <h2 class="pref-section-title">🥗 Dietary Preferences</h2>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="diet_type">Diet Type <span class="required">*</span></label>
+            <select id="diet_type" name="diet_type" class="form-control" required>
+              <option value="">-- Select --</option>
+              {% set cur_diet = (form.diet_type if form else
+                                 (diet_pref.diet_type if diet_pref else '')) %}
+              <option value="Vegetarian"     {% if cur_diet == 'Vegetarian'     %}selected{% endif %}>Vegetarian</option>
+              <option value="Non-Vegetarian" {% if cur_diet == 'Non-Vegetarian' %}selected{% endif %}>Non-Vegetarian</option>
+              <option value="Eggetarian"     {% if cur_diet == 'Eggetarian'     %}selected{% endif %}>Eggetarian</option>
+              <option value="Vegan"          {% if cur_diet == 'Vegan'          %}selected{% endif %}>Vegan</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="cultural_preference">Cultural / Regional Food Preference</label>
+            <select id="cultural_preference" name="cultural_preference" class="form-control">
+              {% set cur_cult = (form.cultural_preference if form else
+                                 (diet_pref.cultural_preference if diet_pref else '')) %}
+              <option value="General"      {% if cur_cult == 'General'      %}selected{% endif %}>General Indian</option>
+              <option value="North Indian" {% if cur_cult == 'North Indian' %}selected{% endif %}>North Indian</option>
+              <option value="South Indian" {% if cur_cult == 'South Indian' %}selected{% endif %}>South Indian</option>
+              <option value="Bengali"      {% if cur_cult == 'Bengali'      %}selected{% endif %}>Bengali</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="preferred_foods">
+            Foods You Like (optional, comma-separated)
+          </label>
+          <input type="text" id="preferred_foods" name="preferred_foods"
+                 class="form-control"
+                 placeholder="e.g. rice, dal, banana, chicken"
+                 value="{{ form.preferred_foods if form else (diet_pref.preferred_foods if diet_pref else '') }}" />
+          <small class="form-hint">These will be prioritised in your meal plan.</small>
+        </div>
+
+        <div class="form-group">
+          <label for="disliked_foods">
+            Foods You Dislike / Avoid (optional, comma-separated)
+          </label>
+          <input type="text" id="disliked_foods" name="disliked_foods"
+                 class="form-control"
+                 placeholder="e.g. oats, paneer"
+                 value="{{ form.disliked_foods if form else (diet_pref.disliked_foods if diet_pref else '') }}" />
+          <small class="form-hint">These will be excluded from your meal plan.</small>
+        </div>
+      </div>
+
+      <!-- ======= BUDGET ======= -->
+      <div class="pref-section">
+        <h2 class="pref-section-title">💰 Monthly Food Budget</h2>
+        <div class="form-group">
+          <label for="budget">Budget Category <span class="required">*</span></label>
+          <div class="budget-options">
+            {% set cur_budget = (form.budget if form else (diet_pref.budget if diet_pref else '')) %}
+            <label class="budget-option {% if cur_budget == 'Low' %}active{% endif %}">
+              <input type="radio" name="budget" value="Low"
+                     {% if cur_budget == 'Low' %}checked{% endif %} required />
+              <span class="budget-label">
+                <strong>Low Budget</strong>
+                <small>Affordable everyday foods</small>
+              </span>
+            </label>
+            <label class="budget-option {% if cur_budget == 'Medium' %}active{% endif %}">
+              <input type="radio" name="budget" value="Medium"
+                     {% if cur_budget == 'Medium' %}checked{% endif %} />
+              <span class="budget-label">
+                <strong>Medium Budget</strong>
+                <small>Moderate variety of foods</small>
+              </span>
+            </label>
+            <label class="budget-option {% if cur_budget == 'Flexible' %}active{% endif %}">
+              <input type="radio" name="budget" value="Flexible"
+                     {% if cur_budget == 'Flexible' %}checked{% endif %} />
+              <span class="budget-label">
+                <strong>Flexible Budget</strong>
+                <small>Premium and specialty foods</small>
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">
+          Generate My Personalised Plan →
+        </button>
+      </div>
+
+    </form>
+  </div>
+</section>
+{% endblock %}

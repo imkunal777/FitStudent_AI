@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Meal Plan – FitStudent AI{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="page-title">Your Daily Meal Plan</h1>
+    <p class="page-subtitle">
+      Goal: <strong>{{ user.fitness_goal }}</strong> &nbsp;·&nbsp;
+      Diet: <strong>{{ user.diet_pref.diet_type if user.diet_pref else 'N/A' }}</strong> &nbsp;·&nbsp;
+      Budget: <strong>{{ user.diet_pref.budget if user.diet_pref else 'N/A' }}</strong> &nbsp;·&nbsp;
+      Culture: <strong>{{ user.diet_pref.cultural_preference if user.diet_pref else 'General' }}</strong>
+    </p>
+    <p class="disclaimer">
+      ⚠️ Calorie and protein values are approximate estimates. This is not a clinical diet plan.
+      Adjust portion sizes based on your actual hunger and energy levels.
+    </p>
+
+    <!-- Calorie target reminder -->
+    <div class="calorie-banner">
+      <div class="cal-item">
+        <span class="cal-label">Daily Target</span>
+        <span class="cal-val">{{ metrics.daily_calories }} kcal</span>
+      </div>
+      <div class="cal-item">
+        <span class="cal-label">Protein Target</span>
+        <span class="cal-val">{{ metrics.protein_min_g }}–{{ metrics.protein_max_g }} g</span>
+      </div>
+      <div class="cal-item">
+        <span class="cal-label">Water Goal</span>
+        <span class="cal-val">{{ metrics.water_litres }} L</span>
+      </div>
+    </div>
+
+    {% if plan %}
+      {% set meals = [
+        ('breakfast', '🌅 Breakfast',    plan.breakfast),
+        ('lunch',     '☀️ Lunch',        plan.lunch),
+        ('snack',     '🍎 Evening Snack', plan.snack),
+        ('dinner',    '🌙 Dinner',        plan.dinner),
+      ] %}
+
+      <div class="meal-grid">
+        {% for slot, label, items in meals %}
+          <div class="meal-card">
+            <div class="meal-header">{{ label }}</div>
+            {% if items %}
+              <table class="food-table">
+                <thead>
+                  <tr>
+                    <th>Food Item</th>
+                    <th>Serving</th>
+                    <th>~Calories</th>
+                    <th>~Protein</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for food in items %}
+                    <tr>
+                      <td><strong>{{ food.name }}</strong></td>
+                      <td class="muted">{{ food.serving_size }}</td>
+                      <td>{{ food.calories }} kcal</td>
+                      <td>{{ food.protein_g }} g</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% else %}
+              <p class="muted">No items for this meal slot.</p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Day totals -->
+      {% if plan.totals %}
+        <div class="totals-bar mt-2">
+          <span>📊 Estimated Day Total:</span>
+          <strong>{{ plan.totals.calories }} kcal</strong> &nbsp;·&nbsp;
+          <strong>{{ plan.totals.protein_g }} g protein</strong>
+        </div>
+      {% endif %}
+
+    {% else %}
+      <div class="empty-state">
+        <p>No meal plan found.</p>
+        <a href="{{ url_for('preferences') }}" class="btn btn-primary">Set Preferences First →</a>
+      </div>
+    {% endif %}
+
+    <div class="action-bar mt-2">
+      <a href="{{ url_for('dashboard') }}" class="btn btn-outline">← Back to Dashboard</a>
+      <a href="{{ url_for('regenerate') }}" class="btn btn-outline"
+         onclick="return confirm('Regenerate your meal plan?')">🔄 Regenerate</a>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

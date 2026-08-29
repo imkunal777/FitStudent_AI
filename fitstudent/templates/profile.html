@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}My Profile – FitStudent AI{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container form-container">
+    <h1 class="page-title">
+      {% if user %}Update Your Profile{% else %}Create Your Profile{% endif %}
+    </h1>
+    <p class="page-subtitle">
+      This information is used to calculate your personalised fitness metrics.
+    </p>
+
+    <form id="profileForm" method="POST" action="{{ url_for('profile') }}" novalidate>
+
+      <!-- Name -->
+      <div class="form-group">
+        <label for="name">Full Name <span class="required">*</span></label>
+        <input type="text" id="name" name="name" class="form-control"
+               placeholder="e.g. Rahul Sharma"
+               value="{{ form.name if form else (user.name if user else '') }}"
+               required maxlength="120" />
+      </div>
+
+      <!-- Age & Gender row -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="age">Age <span class="required">*</span></label>
+          <input type="number" id="age" name="age" class="form-control"
+                 placeholder="e.g. 20"
+                 value="{{ form.age if form else (user.age if user else '') }}"
+                 min="10" max="100" required />
+        </div>
+        <div class="form-group">
+          <label for="gender">Gender <span class="required">*</span></label>
+          <select id="gender" name="gender" class="form-control" required>
+            <option value="">-- Select --</option>
+            {% set cur_gender = (form.gender if form else (user.gender if user else '')) %}
+            <option value="Male"   {% if cur_gender == 'Male'   %}selected{% endif %}>Male</option>
+            <option value="Female" {% if cur_gender == 'Female' %}selected{% endif %}>Female</option>
+            <option value="Other"  {% if cur_gender == 'Other'  %}selected{% endif %}>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Height & Weight row -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="height">Height (cm) <span class="required">*</span></label>
+          <input type="number" id="height" name="height" class="form-control"
+                 placeholder="e.g. 170"
+                 value="{{ form.height if form else (user.height if user else '') }}"
+                 min="50" max="300" step="0.1" required />
+        </div>
+        <div class="form-group">
+          <label for="weight">Weight (kg) <span class="required">*</span></label>
+          <input type="number" id="weight" name="weight" class="form-control"
+                 placeholder="e.g. 65"
+                 value="{{ form.weight if form else (user.weight if user else '') }}"
+                 min="20" max="500" step="0.1" required />
+        </div>
+      </div>
+
+      <!-- Activity Level -->
+      <div class="form-group">
+        <label for="activity_level">Activity Level <span class="required">*</span></label>
+        <select id="activity_level" name="activity_level" class="form-control" required>
+          <option value="">-- Select --</option>
+          {% set cur_act = (form.activity_level if form else (user.activity_level if user else '')) %}
+          <option value="Sedentary"         {% if cur_act == 'Sedentary'         %}selected{% endif %}>Sedentary (little or no exercise)</option>
+          <option value="Lightly Active"    {% if cur_act == 'Lightly Active'    %}selected{% endif %}>Lightly Active (1-3 days/week)</option>
+          <option value="Moderately Active" {% if cur_act == 'Moderately Active' %}selected{% endif %}>Moderately Active (3-5 days/week)</option>
+          <option value="Very Active"       {% if cur_act == 'Very Active'       %}selected{% endif %}>Very Active (6-7 days/week)</option>
+        </select>
+      </div>
+
+      <!-- Fitness Goal -->
+      <div class="form-group">
+        <label for="fitness_goal">Fitness Goal <span class="required">*</span></label>
+        <select id="fitness_goal" name="fitness_goal" class="form-control" required>
+          <option value="">-- Select --</option>
+          {% set cur_goal = (form.fitness_goal if form else (user.fitness_goal if user else '')) %}
+          <option value="Weight Loss"     {% if cur_goal == 'Weight Loss'     %}selected{% endif %}>Weight Loss</option>
+          <option value="Weight Gain"     {% if cur_goal == 'Weight Gain'     %}selected{% endif %}>Weight Gain</option>
+          <option value="Muscle Building" {% if cur_goal == 'Muscle Building' %}selected{% endif %}>Muscle Building</option>
+          <option value="General Fitness" {% if cur_goal == 'General Fitness' %}selected{% endif %}>General Fitness</option>
+          <option value="Improve Stamina" {% if cur_goal == 'Improve Stamina' %}selected{% endif %}>Improve Stamina</option>
+        </select>
+      </div>
+
+      <!-- Fitness Level -->
+      <div class="form-group">
+        <label for="fitness_level">Current Fitness Level <span class="required">*</span></label>
+        <select id="fitness_level" name="fitness_level" class="form-control" required>
+          <option value="">-- Select --</option>
+          {% set cur_lvl = (form.fitness_level if form else (user.fitness_level if user else '')) %}
+          <option value="Beginner"     {% if cur_lvl == 'Beginner'     %}selected{% endif %}>Beginner</option>
+          <option value="Intermediate" {% if cur_lvl == 'Intermediate' %}selected{% endif %}>Intermediate</option>
+          <option value="Advanced"     {% if cur_lvl == 'Advanced'     %}selected{% endif %}>Advanced</option>
+        </select>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">
+          {% if user %}Update Profile{% else %}Save & Continue →{% endif %}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</section>
+{% endblock %}

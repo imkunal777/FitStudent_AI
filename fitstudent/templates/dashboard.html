@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}Dashboard – FitStudent AI{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="page-title">
+      Hello, {{ user.name.split()[0] }}! 👋
+    </h1>
+    <p class="page-subtitle">Here is your personalised fitness overview.</p>
+
+    <!-- ===== USER SUMMARY ===== -->
+    <div class="dashboard-top">
+      <div class="info-pill">🎯 Goal: <strong>{{ user.fitness_goal }}</strong></div>
+      <div class="info-pill">⚡ Level: <strong>{{ user.fitness_level }}</strong></div>
+      <div class="info-pill">🏃 Activity: <strong>{{ user.activity_level }}</strong></div>
+    </div>
+
+    <!-- ===== FITNESS ANALYSIS CARDS ===== -->
+    <h2 class="section-title mt-2">Fitness Analysis</h2>
+    <p class="disclaimer">
+      ⚠️ These are general fitness estimates and are <strong>not medical advice</strong>.
+    </p>
+
+    <div class="grid grid-3">
+      <div class="metric-card {% if metrics.bmi_category == 'Healthy Range' %}metric-good{% elif metrics.bmi_category == 'Underweight' %}metric-warn{% else %}metric-alert{% endif %}">
+        <div class="metric-label">BMI</div>
+        <div class="metric-value">{{ metrics.bmi }}</div>
+        <div class="metric-sub">{{ metrics.bmi_category }}</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Basal Metabolic Rate</div>
+        <div class="metric-value">{{ metrics.bmr }} <span class="metric-unit">kcal/day</span></div>
+        <div class="metric-sub">Calories at complete rest</div>
+      </div>
+      <div class="metric-card metric-primary">
+        <div class="metric-label">Daily Calorie Target</div>
+        <div class="metric-value">{{ metrics.daily_calories }} <span class="metric-unit">kcal</span></div>
+        <div class="metric-sub">Adjusted for goal &amp; activity</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Protein Target</div>
+        <div class="metric-value">{{ metrics.protein_min_g }}–{{ metrics.protein_max_g }} <span class="metric-unit">g</span></div>
+        <div class="metric-sub">Daily protein range</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Water Intake</div>
+        <div class="metric-value">{{ metrics.water_litres }} <span class="metric-unit">L</span></div>
+        <div class="metric-sub">Recommended daily water</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Body Weight</div>
+        <div class="metric-value">{{ user.weight }} <span class="metric-unit">kg</span></div>
+        <div class="metric-sub">Height: {{ user.height }} cm</div>
+      </div>
+    </div>
+
+    <!-- ===== PLAN SUMMARY ===== -->
+    <div class="grid grid-2 mt-2">
+
+      <!-- Workout Summary -->
+      <div class="summary-card">
+        <h3>🏋️ Workout Plan Summary</h3>
+        {% if workout_summary %}
+          <p><strong>{{ workout_summary.workout_days }}</strong> workout days &nbsp;·&nbsp;
+             <strong>{{ workout_summary.rest_days }}</strong> rest days per week</p>
+          <ul class="focus-list">
+            {% for f in workout_summary.focuses %}
+              <li>{{ f }}</li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="muted">No workout plan yet.</p>
+        {% endif %}
+        <a href="{{ url_for('workout_plan') }}" class="btn btn-outline mt-1">View Full Workout Plan →</a>
+      </div>
+
+      <!-- Meal Summary -->
+      <div class="summary-card">
+        <h3>🥗 Meal Plan Summary</h3>
+        {% if meal_summary %}
+          <p>Estimated daily intake:
+            <strong>{{ meal_summary.total_calories }} kcal</strong> &nbsp;·&nbsp;
+            <strong>{{ meal_summary.total_protein }} g protein</strong>
+          </p>
+          {% if meal_summary.breakfast_names %}
+            <p class="muted-label">Breakfast includes:</p>
+            <ul class="focus-list">
+              {% for n in meal_summary.breakfast_names %}
+                <li>{{ n }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% else %}
+          <p class="muted">No meal plan yet.</p>
+        {% endif %}
+        <a href="{{ url_for('meal_plan') }}" class="btn btn-outline mt-1">View Full Meal Plan →</a>
+      </div>
+
+    </div>
+
+    <!-- ===== ACTION BUTTONS ===== -->
+    <div class="action-bar mt-2">
+      <a href="{{ url_for('progress') }}" class="btn btn-secondary">📈 Track Progress</a>
+      <a href="{{ url_for('profile') }}"  class="btn btn-outline">✏️ Update Profile</a>
+      <a href="{{ url_for('preferences') }}" class="btn btn-outline">⚙️ Update Preferences</a>
+      <a href="{{ url_for('regenerate') }}" class="btn btn-outline"
+         onclick="return confirm('Regenerate your plans with current preferences?')">
+        🔄 Regenerate Plans
+      </a>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

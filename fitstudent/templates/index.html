@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}FitStudent AI – Home{% endblock %}
+
+{% block content %}
+
+<!-- ===== HERO SECTION ===== -->
+<section class="hero">
+  <div class="container hero-content">
+    <span class="hero-badge">AI-Powered Fitness</span>
+    <h1>FitStudent <span class="accent">AI</span></h1>
+    <p class="hero-tagline">
+      Personalized Fitness and Nutrition Plans<br>Designed Around <em>You</em>.
+    </p>
+    <a href="{{ url_for('profile') }}" class="btn btn-primary btn-lg">Get Started →</a>
+  </div>
+</section>
+
+<!-- ===== PROBLEM SECTION ===== -->
+<section class="section section-alt">
+  <div class="container">
+    <h2 class="section-title">Why Generic Plans Don't Work for Students</h2>
+    <p class="section-subtitle">
+      Most fitness apps give the same plan to everyone. But every student is different.
+    </p>
+    <div class="grid grid-2">
+      <div class="problem-card">
+        <div class="problem-icon">💰</div>
+        <h3>Tight Budgets</h3>
+        <p>Expensive protein supplements and gym memberships are often out of reach. FitStudent AI recommends affordable, practical foods.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">🍛</div>
+        <h3>Cultural Food Preferences</h3>
+        <p>Generic apps ignore regional and cultural dietary habits. Your meals should reflect what you actually enjoy eating.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">🏠</div>
+        <h3>Limited Equipment</h3>
+        <p>Not everyone has a gym nearby. Your workout plan adapts to what you have — bodyweight, dumbbells, resistance bands, or a full gym.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">🎯</div>
+        <h3>Individual Goals</h3>
+        <p>Weight loss, muscle gain, stamina improvement — each goal requires a completely different approach.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURES SECTION ===== -->
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">What FitStudent AI Offers</h2>
+    <div class="grid grid-3">
+      <div class="feature-card">
+        <div class="feature-icon">🏋️</div>
+        <h3>Personalized Workout Plans</h3>
+        <p>A full 7-day plan designed around your goal, fitness level, and available equipment.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🥗</div>
+        <h3>Budget-Friendly Meal Plans</h3>
+        <p>Daily meals planned around your budget, diet type, and cultural food preferences.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Fitness Analysis</h3>
+        <p>Instant BMI, BMR, daily calorie estimate, protein targets, and water intake recommendations.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📈</div>
+        <h3>Progress Tracking</h3>
+        <p>Log your weight and workout completion daily. Watch your progress over time.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌍</div>
+        <h3>Cultural Food Support</h3>
+        <p>Bengali, North Indian, South Indian, and more — your meals respect your culture.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚙️</div>
+        <h3>Equipment-Based Workouts</h3>
+        <p>From zero equipment to full gym access — every student gets an appropriate programme.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section class="section section-alt">
+  <div class="container">
+    <h2 class="section-title">How It Works</h2>
+    <div class="steps-row">
+      <div class="step-item">
+        <div class="step-number">1</div>
+        <h3>Create Your Profile</h3>
+        <p>Enter your age, height, weight, gender, activity level, and fitness goal.</p>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step-item">
+        <div class="step-number">2</div>
+        <h3>Set Your Preferences</h3>
+        <p>Tell us your diet, budget, cultural food preference, and available equipment.</p>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step-item">
+        <div class="step-number">3</div>
+        <h3>Get Your Plan</h3>
+        <p>FitStudent AI generates a personalized workout and meal plan just for you.</p>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step-item">
+        <div class="step-number">4</div>
+        <h3>Track Progress</h3>
+        <p>Log your daily weight and workout completion to stay on track.</p>
+      </div>
+    </div>
+    <div class="text-center mt-2">
+      <a href="{{ url_for('profile') }}" class="btn btn-primary btn-lg">Start Now →</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
