@@ -3,12 +3,13 @@ app.py – FitStudent AI Flask application entry point.
 Contains all route definitions and application factory.
 """
 import json
+import os
 from datetime import date
 
 from flask import (Flask, render_template, request, redirect,
                    url_for, flash, session)
 
-from config import DevelopmentConfig
+from config import DevelopmentConfig, ProductionConfig
 from extensions import db
 
 # ----------------------------------------------------------------
@@ -17,7 +18,9 @@ from extensions import db
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_object(DevelopmentConfig)
+    # Use ProductionConfig on hosted environments (no FLASK_DEBUG set)
+    cfg = DevelopmentConfig if os.environ.get("FLASK_DEBUG") else ProductionConfig
+    app.config.from_object(cfg)
 
     db.init_app(app)
 
@@ -50,7 +53,7 @@ def create_app():
             user_id = session.get("user_id")
 
             if user_id:
-                user = User.query.get(user_id)
+                user = db.session.get(User, user_id)
             else:
                 user = None
 
@@ -80,7 +83,7 @@ def create_app():
 
         # GET – pre-fill if user exists
         user_id = session.get("user_id")
-        user    = User.query.get(user_id) if user_id else None
+        user    = db.session.get(User, user_id) if user_id else None
         return render_template("profile.html", user=user)
 
     # ---- PREFERENCES -----------------------------------------------
@@ -91,7 +94,7 @@ def create_app():
             flash("Please create your profile first.", "warning")
             return redirect(url_for("profile"))
 
-        user = User.query.get(user_id)
+        user = db.session.get(User, user_id)
         if not user:
             flash("User not found. Please create your profile.", "warning")
             return redirect(url_for("profile"))
@@ -149,7 +152,7 @@ def create_app():
             flash("Please create your profile first.", "warning")
             return redirect(url_for("profile"))
 
-        user = User.query.get(user_id)
+        user = db.session.get(User, user_id)
         if not user:
             flash("User not found.", "warning")
             return redirect(url_for("profile"))
@@ -184,7 +187,7 @@ def create_app():
             flash("Please create your profile first.", "warning")
             return redirect(url_for("profile"))
 
-        user = User.query.get(user_id)
+        user = db.session.get(User, user_id)
         if not user:
             return redirect(url_for("profile"))
 
@@ -203,7 +206,7 @@ def create_app():
             flash("Please create your profile first.", "warning")
             return redirect(url_for("profile"))
 
-        user = User.query.get(user_id)
+        user = db.session.get(User, user_id)
         if not user:
             return redirect(url_for("profile"))
 
@@ -223,7 +226,7 @@ def create_app():
             flash("Please create your profile first.", "warning")
             return redirect(url_for("profile"))
 
-        user = User.query.get(user_id)
+        user = db.session.get(User, user_id)
         if not user:
             return redirect(url_for("profile"))
 
@@ -240,7 +243,7 @@ def create_app():
             flash("Please create your profile first.", "warning")
             return redirect(url_for("profile"))
 
-        user = User.query.get(user_id)
+        user = db.session.get(User, user_id)
         if not user:
             return redirect(url_for("profile"))
 
@@ -278,7 +281,7 @@ def create_app():
     def regenerate():
         user_id = session.get("user_id")
         if user_id:
-            user = User.query.get(user_id)
+            user = db.session.get(User, user_id)
             if user and user.diet_pref and user.workout_pref:
                 _generate_and_save_plans(user)
                 flash("Your plan has been regenerated.", "success")
